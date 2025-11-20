@@ -1,0 +1,254 @@
+/* ---------- Global Styles ---------- */
+:root {
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --muted: #7b8596;
+  --accent: #2563eb;
+  --accent-2: #06b6d4;
+  --success: #15803d;
+  --danger: #dc2626;
+  --radius: 14px;
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+  color: #0f172a;
+}
+
+/* ---------- App Container ---------- */
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+header {
+  background: linear-gradient(90deg, #0d6efd, #3a86ff);
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+}
+header p {
+  margin: 6px 0 0;
+  opacity: 0.95;
+  font-weight: 300;
+}
+
+/* ---------- Doctor Grid ---------- */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.doctor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .doctor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 680px) {
+  .doctor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Doctor Card ---------- */
+.doctor-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.doctor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+}
+
+/* ---------- Doctor Image ---------- */
+.doctor-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 260px; /* slightly taller for better fit */
+  overflow: hidden;
+  background: #f1f5f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Fit faces properly regardless of aspect ratio */
+.doctor-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%; /* focus slightly higher to show faces */
+  transition: transform 0.3s ease;
+}
+.doctor-card:hover .doctor-thumb {
+  transform: scale(1.05);
+}
+
+/* ---------- Doctor Info ---------- */
+.doctor-info {
+  padding: 14px 16px;
+  text-align: left;
+}
+.doctor-info h3 {
+  margin: 0;
+  color: #023047;
+  font-size: 1.05rem;
+}
+.doctor-info p {
+  margin: 6px 0 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Specialty badge */
+.specialty-badge {
+  display: inline-block;
+  background: #e8f0ff;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  color: #084298;
+  margin-top: 8px;
+  margin-right: 6px;
+}
+
+/* Fee styling */
+.doctor-fee {
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
+/* ---------- Booking Section ---------- */
+.booking-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding: 2rem 0;
+  text-align: center;
+}
+.booking-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+.booking-section p {
+  color: var(--muted);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+/* ---------- Booking Form ---------- */
+.booking-form {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ---------- Input Fields ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.label {
+  font-size: 12px;
+  color: var(--muted);
+}
+input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6eef8;
+  font-size: 14px;
+  outline: none;
+}
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+}
+
+/* ---------- Buttons ---------- */
+.actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn.primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+}
+
+/* ---------- Status ---------- */
+.status {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+.status.ok {
+  background: #ecfdf5;
+  color: var(--success);
+  border: 1px solid #bbf7d0;
+}
+.status.err {
+  background: #fff1f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+/* ---------- Footer ---------- */
+footer {
+  text-align: center;
+  padding: 14px;
+  color: #556;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
