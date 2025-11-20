@@ -13,5 +13,8 @@ frontend/node_modules/
 frontend/.env
 frontend/build/
 
+# Node.js
+node_modules/
+
 # System
 .DS_Store
