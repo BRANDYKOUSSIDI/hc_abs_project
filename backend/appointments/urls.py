@@ -8,6 +8,7 @@ from .views import (
     AppointmentViewSet,
     PatientViewSet,
     RegisterView,
+    GenerateSlotsView,
 )
 
 # Create the API router
@@ -21,5 +22,6 @@ router.register(r'appointments', AppointmentViewSet, basename='appointment')
 # Add custom non-viewset routes (e.g., registration)
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
+    path('generate-slots/', GenerateSlotsView.as_view(), name='generate-slots'),
     path('', include(router.urls)),
 ]

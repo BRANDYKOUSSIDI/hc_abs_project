@@ -11,9 +11,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------
 # SECURITY
 # ------------------------------------------------------
-SECRET_KEY = "django-insecure-!$15g&e14=!ctyb46gnql7k0t2d&a(zpua8t9^kup_t=-y(10v"
-DEBUG = True
-ALLOWED_HOSTS = ["*", "127.0.0.1", "localhost"]
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-insecure-key")
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 # ------------------------------------------------------
 # APPLICATIONS
@@ -141,11 +141,21 @@ SIMPLE_JWT = {
 }
 
 # ------------------------------------------------------
+# EMAIL (console backend for demo; replace in production)
+# ------------------------------------------------------
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@hc-abs.local")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "False").lower() == "true"
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "False").lower() == "true"
+
+# ------------------------------------------------------
 # CORS (allow React frontend)
 # ------------------------------------------------------
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOW_ALL_ORIGINS", "True").lower() == "true"
+_cors_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_origins.split(",") if o.strip()]
 CORS_ALLOW_CREDENTIALS = True

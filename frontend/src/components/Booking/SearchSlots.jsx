@@ -1,6 +1,6 @@
 // frontend/src/components/Booking/SearchSlots.jsx
-import React, { useEffect, useState } from "react";
-import { fetchSpecialties, fetchProviders, fetchSlotsByProvider } from "../../api/client";
+import React, { useEffect, useState, useRef } from "react";
+import { fetchSpecialties, fetchProviders, fetchSlotsByProvider, generateSlots } from "../../api/client";
 import BookingForm from "./BookingForm";
 import DoctorCard from "./DoctorCard";
 
@@ -15,6 +15,7 @@ export default function SearchSlots({ provider: initialProvider = null }) {
   const [loading, setLoading] = useState(true);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [error, setError] = useState(null);
+  const bookingCardRef = useRef(null);
 
   useEffect(() => {
     let mounted = true;
@@ -51,11 +52,26 @@ export default function SearchSlots({ provider: initialProvider = null }) {
     fetchSlotsByProvider(selectedProvider.id)
       .then((res) => {
         const data = res.data.results ?? res.data ?? [];
+        // The backend automatically generates slots if they don't exist,
+        // but if still no slots, try generating them explicitly
+        if (data.length === 0) {
+          return generateSlots(21)
+            .then(() => fetchSlotsByProvider(selectedProvider.id))
+            .then((res2) => {
+              const newData = res2.data.results ?? res2.data ?? [];
+              setSlots(newData);
+              const firstAvailable = newData.find((s) => s.is_available) ?? newData[0] ?? null;
+              setSelectedSlot(firstAvailable);
+            });
+        }
         setSlots(data);
         const firstAvailable = data.find((s) => s.is_available) ?? data[0] ?? null;
         setSelectedSlot(firstAvailable);
       })
-      .catch(() => setError("Failed to load slots for provider"))
+      .catch((err) => {
+        console.error("Failed to load slots:", err);
+        setError("Failed to load slots for provider");
+      })
       .finally(() => setLoadingSlots(false));
   }, [selectedProvider]);
 
@@ -63,6 +79,12 @@ export default function SearchSlots({ provider: initialProvider = null }) {
     setSelectedProvider(p);
     setSelectedSlot(null);
     setSlots([]);
+    // Scroll to booking section when doctor is selected
+    setTimeout(() => {
+      if (bookingCardRef.current) {
+        bookingCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const handleBooked = () => {
@@ -102,7 +124,7 @@ export default function SearchSlots({ provider: initialProvider = null }) {
 
         {/* booking bottom card (centered) */}
         <div className="booking-bottom">
-          <div className="booking-card">
+          <div className="booking-card" ref={bookingCardRef}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <div>
                 <h2>Please select a provider and slot to book.</h2>
@@ -127,23 +149,43 @@ export default function SearchSlots({ provider: initialProvider = null }) {
               {/* Show slots + booking form when provider selected */}
               {selectedProvider && (
                 <>
-                  <div style={{ marginBottom: 12, fontWeight: 700 }}>{selectedProvider.name} — Available slots</div>
+                  <div style={{ marginBottom: 16, fontWeight: 700, fontSize: 18 }}>{selectedProvider.name} — Available Appointment Times</div>
 
-                  {loadingSlots && <div className="muted">Loading slots…</div>}
-                  {!loadingSlots && !slots.length && <div className="muted">No slots available.</div>}
+                  {loadingSlots && <div className="muted" style={{ marginBottom: 16 }}>Loading available slots…</div>}
+                  
+                  {!loadingSlots && slots.length > 0 && (
+                    <div className="slot-container" style={{ marginBottom: 20 }}>
+                      {slots.map((s) => (
+                        <div 
+                          key={s.id} 
+                          className="slot" 
+                          aria-disabled={!s.is_available} 
+                          onClick={() => s.is_available && setSelectedSlot(s)} 
+                          style={{
+                            border: selectedSlot && selectedSlot.id === s.id ? "2px solid var(--accent)" : undefined,
+                            cursor: s.is_available ? "pointer" : "not-allowed",
+                            opacity: s.is_available ? 1 : 0.6
+                          }}
+                        >
+                          <div style={{ fontWeight: 700 }}>{new Date(s.start).toLocaleString()}</div>
+                          <div style={{ fontSize: 12, color: s.is_available ? "var(--success)" : "#556" }}>
+                            {s.is_available ? "✓ Available" : "✗ Booked"}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                  <div className="slot-container" style={{ marginBottom: 12 }}>
-                    {slots.map((s) => (
-                      <div key={s.id} className="slot" aria-disabled={!s.is_available} onClick={() => s.is_available && setSelectedSlot(s)} style={{
-                        border: selectedSlot && selectedSlot.id === s.id ? "2px solid var(--accent)" : undefined
-                      }}>
-                        <div style={{ fontWeight: 700 }}>{new Date(s.start).toLocaleString()}</div>
-                        <div style={{ fontSize: 12, color: "#556" }}>{s.is_available ? "Available" : "Booked"}</div>
-                      </div>
-                    ))}
+                  {!loadingSlots && !slots.length && (
+                    <div className="muted" style={{ marginBottom: 20, padding: 16, background: "#f8fafc", borderRadius: 8 }}>
+                      No slots available for this doctor at the moment. Please check back later.
+                    </div>
+                  )}
+
+                  {/* Booking form - always show when doctor is selected */}
+                  <div style={{ marginTop: 20, paddingTop: 20, borderTop: "2px solid #eef2ff" }}>
+                    <BookingForm slot={selectedSlot} provider={selectedProvider} onBooked={() => handleBooked()} />
                   </div>
-
-                  <BookingForm slot={selectedSlot} provider={selectedProvider} onBooked={() => handleBooked()} />
                 </>
               )}
             </div>

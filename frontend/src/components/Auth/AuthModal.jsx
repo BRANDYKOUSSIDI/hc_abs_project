@@ -3,6 +3,7 @@ import { register, login } from "../../api/client";
 
 export default function AuthModal({ onClose = () => {}, onSuccess = () => {} }) {
   const [mode, setMode] = useState("login"); // 'login' or 'register'
+  const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -14,7 +15,7 @@ export default function AuthModal({ onClose = () => {}, onSuccess = () => {} }) 
     setErr(null);
     setBusy(true);
     try {
-      await login({ email, password });
+      await login({ username: username || email, password });
       onSuccess();
     } catch (e) {
       setErr(e.response?.data?.detail ?? JSON.stringify(e.response?.data) ?? e.message);
@@ -27,7 +28,7 @@ export default function AuthModal({ onClose = () => {}, onSuccess = () => {} }) 
     setErr(null);
     setBusy(true);
     try {
-      await register({ full_name: fullName, phone, email });
+      await register({ username, full_name: fullName, phone, email, password });
       await doLogin();
     } catch (e) {
       setErr(e.response?.data ?? e.message);
@@ -56,6 +57,9 @@ export default function AuthModal({ onClose = () => {}, onSuccess = () => {} }) 
           <h3 style={{ margin: 0 }}>{mode === "login" ? "Login" : "Create Account"}</h3>
           <button onClick={onClose} style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 20 }}>✕</button>
         </div>
+
+        <label style={{ display: "block", marginTop: 12 }}>Username</label>
+        <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder={mode === "login" ? "Enter your username" : "Choose a username"} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
 
         {mode === "register" && (
           <>

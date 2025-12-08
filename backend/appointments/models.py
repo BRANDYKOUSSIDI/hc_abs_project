@@ -59,6 +59,35 @@ class Provider(models.Model):
         # show specialty name if available
         spec = self.specialty.name if self.specialty else "No specialty"
         return f"{self.name} ({spec})"
+    
+    def save(self, *args, **kwargs):
+        """Override save to automatically create default schedules for new providers"""
+        is_new = self._state.adding
+        super().save(*args, **kwargs)
+        
+        # If this is a new provider and has no schedules, create default ones
+        if is_new:
+            from datetime import time
+            from .models import ProviderSchedule
+            
+            existing_schedules = ProviderSchedule.objects.filter(provider=self).count()
+            if existing_schedules == 0:
+                # Create Mon-Fri morning & afternoon schedules
+                for wd in range(0, 5):  # Monday to Friday
+                    ProviderSchedule.objects.get_or_create(
+                        provider=self,
+                        weekday=wd,
+                        start_time=time(10, 0),
+                        end_time=time(12, 0),
+                        defaults={'slot_duration_minutes': 30}
+                    )
+                    ProviderSchedule.objects.get_or_create(
+                        provider=self,
+                        weekday=wd,
+                        start_time=time(14, 0),
+                        end_time=time(16, 0),
+                        defaults={'slot_duration_minutes': 30}
+                    )
 
 
 class Patient(models.Model):

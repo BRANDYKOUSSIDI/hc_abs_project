@@ -135,12 +135,23 @@ export const createPatient = (payload) => api.post("/patients/", payload);
 // Appointments: create booking
 export const createAppointment = (payload) => api.post("/appointments/", payload);
 
+// Appointments: list by patient contact
+export const fetchAppointmentsByContact = ({ phone, email }) =>
+  api.get("/appointments/by_contact/", { params: { phone, email } });
+
+// Appointments: cancel
+export const cancelAppointment = (id) => api.post(`/appointments/${id}/cancel/`);
+
+// Generate slots for all providers
+export const generateSlots = (days = 21) => api.post(`/generate-slots/?days=${days}`);
+
 // Auth: register (minimal / uses your RegisterView which creates a Patient)
 export const register = (payload) => api.post("/register/", payload);
 
 // Auth: login -> obtains JWT tokens (expects simplejwt TokenObtainPairView)
-export const login = async ({ email, password }) => {
-  const resp = await api.post("/token/", { email, password });
+// Supports both username and email for login
+export const login = async ({ username, email, password }) => {
+  const resp = await api.post("/token/", { username: username || email, password });
   const { access, refresh } = resp.data;
   saveTokens({ access, refresh });
   return resp;
